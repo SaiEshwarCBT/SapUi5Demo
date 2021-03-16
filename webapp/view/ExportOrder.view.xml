@@ -1,0 +1,174 @@
+<mvc:View controllerName="exportOrder.ExportOrderFulfillment.controller.ExportOrder" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:viz="sap.viz.ui5.controls"
+	xmlns:layout="sap.ui.layout" xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds" xmlns:viz.data="sap.viz.ui5.data"
+	xmlns:fb="sap.ui.comp.filterbar" xmlns:f="sap.f" xmlns:chart="sap.suite.ui.commons" height="100%">
+	<App id="idAppControl">
+		<pages>
+			<Page showHeader="false">
+				<content>
+					<f:DynamicPage id="dynamicPageId">
+						<f:title>
+							<f:DynamicPageTitle>
+								<f:heading>
+									<Text text="Filters"></Text>
+								</f:heading>
+								<f:actions>
+									<ToolbarSpacer/>
+								</f:actions>
+							</f:DynamicPageTitle>
+						</f:title>
+						<f:header>
+							<f:DynamicPageHeader pinnable="true">
+								<f:content>
+									<fb:FilterBar reset="onReset" search="onSearch" useToolbar="false" showGoOnFB="false" showRestoreButton="false"
+										showFilterConfiguration="false">
+										<fb:filterGroupItems>
+											<fb:FilterGroupItem groupName="G1" name="A" label="{i18n>plant}" mandatory="true" visibleInFilterBar="true">
+												<fb:control>
+													<ComboBox id="plant" placeholder="Plant" class="comboBoxHeight" items="{plant>/}" selectionChange="changePlantViz"
+														showSecondaryValues="true" enabled="true">
+														<core:ListItem key="{plant>key}" text="{plant>plantDataCom}" additionalText="{plant>plantDescData}"/>
+													</ComboBox>
+												</fb:control>
+											</fb:FilterGroupItem>
+											<fb:FilterGroupItem groupName="G1" name="B" label="Customer" mandatory="true" visibleInFilterBar="true">
+												<fb:control>
+													<ComboBox id="customer" placeholder="Customer" class="comboBoxHeight" items="{customer>/}" showSecondaryValues="true"
+														selectionChange="changeCustomerViz">
+														<core:ListItem key="{customer>key}" text="{customer>custDataCom}" additionalText="{customer>custDescData}"/>
+													</ComboBox>
+												</fb:control>
+											</fb:FilterGroupItem>
+											<fb:FilterGroupItem id="datePickerGrp" groupName="G1" name="C" label="Date Range" mandatory="false" visibleInFilterBar="true">
+												<fb:control>
+													<DateRangeSelection id="datePicker" class="comboBoxHeight" change="changeDateViz"></DateRangeSelection>
+												</fb:control>
+											</fb:FilterGroupItem>
+											<fb:FilterGroupItem id="saleOrderGrp" groupName="G1" name="D" label="Sales Order" mandatory="false" visibleInFilterBar="true">
+												<fb:control>
+													<ComboBox id="saleOrder" placeholder="Sales Order" class="comboBoxHeight" items="{saleOrder>/}" showSecondaryValues="true"
+														selectionChange="changeSaleOrderTbl">
+														<core:ListItem key="{saleOrder>key}" text="{saleOrder>soDataCom}"/>
+													</ComboBox>
+												</fb:control>
+											</fb:FilterGroupItem>
+											<fb:FilterGroupItem id="materialGrp" groupName="G1" name="E" label="Material" mandatory="false" visibleInFilterBar="true">
+												<fb:control>
+													<ComboBox id="material" placeholder="Material" class="comboBoxHeight" items="{material>/}" showSecondaryValues="true"
+														selectionChange="changeMatTab">
+														<core:ListItem key="{material>key}" text="{material>matDataCom}" additionalText="{material>matDescData}"/>
+													</ComboBox>
+												</fb:control>
+											</fb:FilterGroupItem>
+										</fb:filterGroupItems>
+									</fb:FilterBar>
+								</f:content>
+							</f:DynamicPageHeader>
+						</f:header>
+						<f:content>
+							<layout:FixFlex id='chartFixFlex' minFlexSize="250" class="fixFlexHorizontal" vertical="false">
+								<layout:flexContent>
+									<chart:ChartContainer id="chartContainer" showFullScreen="true" showZoom="false" title="Export Order Fulfillment" showLegendButton="false"
+										autoAdjustHeight="true" contentChange="getTableIcon">
+										<chart:ChartContainerContent icon="sap-icon://bar-chart" title="Bar Chart">
+											<chart:content>
+												<Panel class="sapFDynamicPageAlignContent" width="100%" height="100%">
+													<layout:Grid class="gridHeight">
+														<viz:VizFrame id="orderVizframe" width="100%" height="100%" vizType='info/column' selectData="getListData" uiConfig="{applicationSet:'fiori'}">
+															<viz:layoutData><layout:GridData span="XL9 L9 M12 S12"/></viz:layoutData>
+															<viz:dataset>
+																<viz.data:FlattenedDataset data="{orderVizframe>/}">
+																	<viz.data:dimensions>
+																		<viz.data:DimensionDefinition name="Material" value="{orderVizframe>materialDesc}"/>
+																	</viz.data:dimensions>
+																	<viz.data:measures>
+																		<viz.data:MeasureDefinition name="BalanceQuantity" value="{orderVizframe>balanceQty}"/>
+																	</viz.data:measures>
+																</viz.data:FlattenedDataset>
+															</viz:dataset>
+															<viz:feeds>
+																<viz.feeds:FeedItem id='valueAxisFeed' uid="valueAxis" type="Measure" values="BalanceQuantity"/>
+																<viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Material"/>
+															</viz:feeds>
+														</viz:VizFrame>
+														<VBox height="400px" alignItems="Center" justifyContent="Center">
+															<Panel class="sapUiSmallMarginEnd BtnClass" width="100%" height="100%">
+																<Text text="Plant : "></Text>
+																<Text id="PlantName" text=""></Text>
+																<ToolbarSeparator></ToolbarSeparator>
+																<Text text="Customer : "></Text>
+																<Text id="CustomerName" text=""></Text>
+																<ToolbarSeparator></ToolbarSeparator>
+																<Text text="Material : "></Text>
+																<Text id="MaterailName" text=""></Text>
+																<ToolbarSeparator></ToolbarSeparator>
+																<Text text="Sale Order Quantity : "></Text>
+																<Text id="SaleOrdQty" text=""></Text>
+																<Text id="SaleOrdUnit" text=""></Text>
+																<ToolbarSeparator></ToolbarSeparator>
+																<Text text="Invoiced Quantity : "></Text>
+																<Text id="InvoicedQty" text=""></Text>
+																<Text id="InvQtyUnit" text=""></Text>
+																<ToolbarSeparator></ToolbarSeparator>
+																<Text text="Balance Quantity : "></Text>
+																<Text id="BalQty" text=""></Text>
+																<Text id="BalQtyUnit" text=""></Text>
+															</Panel>
+														</VBox>
+													</layout:Grid>
+												</Panel>
+											</chart:content>
+										</chart:ChartContainerContent>
+										<chart:ChartContainerContent icon="sap-icon://table-view" title="Table">
+											<chart:content>
+												<Table id="mainTableBody" items="{ path: 'mainTableBody>/', sorter: [{path: 'balanceQty', descending: true}]}" growing="true"
+													growingScrollToLoad="true" growingThreshold="50" width="100%" class="tableMargin sapUiSizeCompact">
+													<columns>
+														<Column hAlign="Left">
+															<Text text="Plant" tooltip="Plant"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Left">
+															<Text text="Customer" tooltip="Customer"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Left">
+															<Text text="Sales ord" tooltip="Sales order"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" width="15%" demandPopin="true" hAlign="Left">
+															<Text text="Material" tooltip="Material"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Order Qty" tooltip="Ordered Qty"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Invoice Qty" tooltip="Invoice Quantity"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Balance Qty" tooltip="Balance Quantity"></Text>
+														</Column>
+													</columns>
+													<items>
+														<ColumnListItem>
+															<cells>
+																<ObjectIdentifier text="{mainTableBody>plant}" title="{mainTableBody>plantDesc}"></ObjectIdentifier>
+																<ObjectIdentifier text="{mainTableBody>customer}" title="{mainTableBody>customerDesc}"></ObjectIdentifier>
+																<ObjectIdentifier title="{mainTableBody>salesOrder}" text="{mainTableBody>item}"></ObjectIdentifier>
+																<ObjectIdentifier text="{mainTableBody>materialNumber}" title="{mainTableBody>materialDesc}"></ObjectIdentifier>
+																<ObjectNumber number="{mainTableBody>orderQty}" unit="{mainTableBody>unit}"></ObjectNumber>
+																<ObjectNumber number="{mainTableBody>invoiceQty}" unit="{mainTableBody>unit}"></ObjectNumber>
+																<ObjectNumber number="{mainTableBody>balanceQty}" unit="{mainTableBody>unit}"></ObjectNumber>
+															</cells>
+														</ColumnListItem>
+													</items>
+												</Table>
+											</chart:content>
+										</chart:ChartContainerContent>
+									</chart:ChartContainer>
+								</layout:flexContent>
+							</layout:FixFlex>
+						</f:content>
+					</f:DynamicPage>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
